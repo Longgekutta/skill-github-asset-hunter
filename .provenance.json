@@ -1,0 +1,33 @@
+{
+  "project_name": "skill-github-asset-hunter",
+  "type": "AGENT_SKILL",
+  "version": "1.0.0",
+  "last_updated": "2026-09-27 11:40:00",
+  "search_topic": "agent specialized skill for instant open source software release discovery and direct asset extraction",
+  "grounded_sources": [
+    {
+      "name": "tool-omniscout-radar",
+      "category": "FIRST_PARTY_RADAR",
+      "url": "https://github.com/Longgekutta/tool-omniscout-radar",
+      "core_insight": "全域第一性原理自主科技雷达与 AI 智算极限能效矩阵"
+    },
+    {
+      "name": "tool-token-distiller",
+      "category": "FIRST_PARTY_DISTILLER",
+      "url": "https://github.com/Longgekutta/tool-token-distiller",
+      "core_insight": "长文档与候选元组 90% 噪音提纯剥离与超高密决策矩阵蒸馏器"
+    },
+    {
+      "name": "tool-citation-optima",
+      "category": "FIRST_PARTY_CITATION",
+      "url": "https://github.com/Longgekutta/tool-citation-optima",
+      "core_insight": "全域文档引用、技术溯源与决策依据极限优化引擎"
+    }
+  ],
+  "architectural_invariants": [
+    "Zero-Hallucination Link Invariant",
+    "Direct Outcome Invariant",
+    "Secret Isolation Invariant",
+    "Three-Tool Synergy Invariant"
+  ]
+}

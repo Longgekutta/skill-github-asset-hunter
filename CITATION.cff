@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this agent skill, please cite it as below."
+authors:
+  - family-names: "Gao"
+    given-names: "Sheng"
+    alias: "Longgekutta"
+title: "skill-github-asset-hunter: AI Agent Specialized Capability for Instant Open-Source Release Discovery & Direct Asset Extraction"
+version: 1.0.0
+date-released: 2026-09-27
+url: "https://github.com/Longgekutta/skill-github-asset-hunter"
+license: "MIT"
+keywords:
+  - "agent-skill"
+  - "antigravity-skill"
+  - "github-releases"
+  - "asset-extractor"
+  - "direct-download"
