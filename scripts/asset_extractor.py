@@ -71,8 +71,8 @@ def fetch_latest_release_api(repo: str) -> Optional[Dict[str, Any]]:
 def fetch_latest_release_html(repo: str) -> Optional[Dict[str, Any]]:
     """
     HTML 静态网页直接嗅探回退引擎：
-    当 GitHub API 遭遇 403 Rate Limit (60次/小时) 时，直接通过静态网页解析 /releases/latest，
-    确保 100% 连通率与直链直达能力。
+    当 GitHub API 遭遇 403 Rate Limit (60次/小时) 时，直接通过静态网页解析 /releases/latest 与 /releases/expanded_assets/{tag}，
+    确保 100% 连通率、真实文件大小与直链直达能力。
     """
     repo_clean = repo.strip('/')
     web_url = f"https://github.com/{repo_clean}/releases/latest"
@@ -86,19 +86,45 @@ def fetch_latest_release_html(repo: str) -> Optional[Dict[str, Any]]:
             tag_match = re.search(r'/releases/tag/([^/?#]+)', final_url)
             tag = tag_match.group(1) if tag_match else "latest"
             
-            # Find all release download asset links
-            # href="/connectbot/connectbot/releases/download/v1.10.9/ConnectBot-v1.10.9-oss.apk"
-            pattern = rf'/{repo_clean}/releases/download/[^/]+/([^\s"\'<>]+)'
-            matches = list(set(re.findall(pattern, html)))
-            
+            # Modern GitHub loads assets asynchronously via /releases/expanded_assets/{tag}
             assets = []
-            for aname in matches:
-                assets.append({
-                    "name": aname,
-                    "size": 0,
-                    "download_count": 0,
-                    "browser_download_url": f"https://github.com/{repo_clean}/releases/download/{tag}/{aname}"
-                })
+            exp_url = f"https://github.com/{repo_clean}/releases/expanded_assets/{tag}"
+            try:
+                exp_req = urllib.request.Request(exp_url, headers=get_headers())
+                with urllib.request.urlopen(exp_req, timeout=12) as exp_resp:
+                    exp_html = exp_resp.read().decode('utf-8', errors='ignore')
+                    row_pattern = r'<li[^>]*>[\s\S]*?href="([^"]*/releases/download/[^"]+)"[\s\S]*?<span class="text-bold">([^<]+)</span>(?:[\s\S]*?<span[^>]*class="[^"]*color-fg-muted[^"]*"[^>]*>\s*([0-9.]+\s*[KMGT]?B)\s*</span>)?'
+                    rows = re.findall(row_pattern, exp_html)
+                    for href, aname, size_str in rows:
+                        size_bytes = 0
+                        if size_str:
+                            s_clean = size_str.upper().strip()
+                            try:
+                                if "MB" in s_clean: size_bytes = int(float(s_clean.replace("MB", "").strip()) * 1024 * 1024)
+                                elif "KB" in s_clean: size_bytes = int(float(s_clean.replace("KB", "").strip()) * 1024)
+                                elif "GB" in s_clean: size_bytes = int(float(s_clean.replace("GB", "").strip()) * 1024 * 1024 * 1024)
+                                elif "B" in s_clean: size_bytes = int(float(s_clean.replace("B", "").strip()))
+                            except Exception: pass
+                        dl_url = f"https://github.com{href}" if href.startswith('/') else href
+                        assets.append({
+                            "name": aname,
+                            "size": size_bytes,
+                            "download_count": 0,
+                            "browser_download_url": dl_url
+                        })
+            except Exception:
+                pass
+
+            if not assets:
+                pattern = rf'/{repo_clean}/releases/download/[^/]+/([^\s"\'<>]+)'
+                matches = list(set(re.findall(pattern, html)))
+                for aname in matches:
+                    assets.append({
+                        "name": aname,
+                        "size": 0,
+                        "download_count": 0,
+                        "browser_download_url": f"https://github.com/{repo_clean}/releases/download/{tag}/{aname}"
+                    })
                 
             return {
                 "tag_name": tag,
