@@ -117,17 +117,21 @@ def categorize_asset(name: str) -> Dict[str, Any]:
     os_type = "UNKNOWN"
     if nl.endswith(".apk") or "android" in nl:
         os_type = "Android"
-    elif nl.endswith((".exe", ".msi")) or "win" in nl or "windows" in nl:
-        os_type = "Windows"
     elif nl.endswith((".dmg", ".pkg")) or "mac" in nl or "darwin" in nl or "osx" in nl:
         os_type = "macOS"
+    elif nl.endswith((".exe", ".msi")) or "windows" in nl or re.search(r'(^|[\-_.\b])win(32|64|dows)?([\-_.\b]|$)', nl):
+        os_type = "Windows"
     elif nl.endswith((".appimage", ".deb", ".rpm")) or "linux" in nl:
         os_type = "Linux"
     elif nl.endswith((".zip", ".tar.gz", ".7z", ".tgz")):
-        if "win" in nl: os_type = "Windows"
-        elif "mac" in nl or "darwin" in nl: os_type = "macOS"
-        elif "linux" in nl: os_type = "Linux"
-        else: os_type = "Archive"
+        if "mac" in nl or "darwin" in nl or "osx" in nl:
+            os_type = "macOS"
+        elif "linux" in nl:
+            os_type = "Linux"
+        elif "windows" in nl or re.search(r'(^|[\-_.\b])win(32|64|dows)?([\-_.\b]|$)', nl):
+            os_type = "Windows"
+        else:
+            os_type = "Archive"
 
     # Architecture
     arch = "Universal / Any"
@@ -256,8 +260,14 @@ def main():
                 if "--top" in sys.argv:
                     t_idx = sys.argv.index("--top")
                     top_n = int(sys.argv[t_idx + 1])
-                for r in data.get("reports", [])[:top_n]:
-                    targets.append(r.get("repo_name"))
+                candidates_list = data.get("reports", [])
+                if not candidates_list and "generations" in data:
+                    for g in data.get("generations", []):
+                        for gem in g.get("top_gems", []):
+                            candidates_list.append({"repo_name": gem.get("repo")})
+                for r in candidates_list[:top_n]:
+                    if r.get("repo_name"):
+                        targets.append(r.get("repo_name"))
                     
     for arg in sys.argv[1:]:
         if not arg.startswith("--") and "/" in arg and arg not in targets:
