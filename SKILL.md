@@ -37,17 +37,20 @@ flowchart LR
 * 剔除“学生大作业、空壳 README、未经验证的演示工程”，锁定工业界标杆候选。
 
 ### 步骤 4：真实 Release 资产与下载直链抓取 (Asset Extraction)
-* 对判定的标杆项目，执行本 Skill 内置辅助脚本：
+* 对判定的标杆项目，执行本 Skill 内置辅助脚本（支持单仓库、多仓库批量或直接读取雷达报告）：
   ```bash
-  python D:/github/skill-github-asset-hunter/scripts/asset_extractor.py "<owner/repo>"
+  # 批量提取或按报告自动提取
+  python D:/github/skill-github-asset-hunter/scripts/asset_extractor.py "<owner/repo1>" "<owner/repo2>"
+  python D:/github/skill-github-asset-hunter/scripts/asset_extractor.py --report path/to/radar_report.json --top 3
   ```
-* 提取最新正式发版标签（Tag）、发版日期、附件文件名、文件大小（MB）与 GitHub 官方直接下载地址 (`browser_download_url`)。
+* 提取最新正式发版标签（Tag）、发版日期、附件文件名、文件大小（MB）、官方原链 (`download_url`) 与国内免翻加速镜像 (`mirror_url`)。内置 HTML 网页回退机制，彻底免疫 GitHub API 60次/小时频控限制。
 
 ### 步骤 5：标准化交付矩阵排版 (Delivery Matrix)
-* 输出必须满足“三要素”：
+* 输出必须满足“四要素”：
   1. **直达性**：必须包含可直接点击开始下载的真实超链接；
-  2. **精确性**：标明文件大小与适用的硬件架构（如 ARM64 / Universal）；
-  3. **客观性**：附带 Star 数、开源协议与核心技术特征（为什么选它）。
+  2. **双通道**：同时提供官方 GitHub 源链与国内高带宽加速镜像通道；
+  3. **精确性**：标明文件大小与适用的硬件架构（如 ARM64 / Universal），过滤一切无意义的符号映射与调试文件；
+  4. **客观性**：附带 Star 数、开源协议与核心技术特征（为什么选它）。
 
 ---
 
@@ -58,8 +61,8 @@ flowchart LR
 * **核心定位**：一句话说明核心架构机制与不可替代性。
 * **最新版本**：`vX.Y.Z` (发布日期: YYYY-MM-DD)
 * **直接下载链接**：
-  * 🟢 **[针对当前平台的主流包 (推荐)] (XX.X MB)**: [直接下载超链接](https://github.com/...)
-  * ⚪ **[通用或次要架构包] (XX.X MB)**: [直接下载超链接](https://github.com/...)
+  * 🟢 **[针对当前平台的主流包 (推荐)] (XX.X MB)**: [官方直接下载](https://github.com/...) ｜ [国内极速镜像](https://ghfast.top/https://github.com/...)
+  * ⚪ **[通用或备用架构包] (XX.X MB)**: [官方直接下载](https://github.com/...) ｜ [国内极速镜像](https://ghfast.top/https://github.com/...)
 * **开源协议**：MIT / Apache-2.0 / GPL-3.0
 ```
 
