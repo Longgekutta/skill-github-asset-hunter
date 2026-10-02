@@ -24,6 +24,6 @@
 
 ---
 
-## 🧭 不变量四：三工具协同不变量 (Three-Tool Synergy Invariant)
-1. 技能必须严格编排底层三工具（`tool-omniscout-radar` ➔ `tool-token-distiller` ➔ `tool-citation-optima`）；
-2. 坚决杜绝脱离工具链的闭门臆造。
+## 🧭 不变量四：权责边界与零越权不变量 (Boundary & Zero-Overreach Invariant)
+1. **负向清单约束**：本技能严守“只读探测与安装资产交付”边界，严禁在执行中创建、修改用户项目文件或执行任何越权写操作；
+2. **红线之上绝对自主**：在零幻觉、零死链的负向红线之上，智能体拥有自主调度探测与提纯的最优自主权，坚决杜绝形式主义空转。
